@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Năm Mới 2026 - Lớp 12a3 Thân Yêu</title>
+    <style>
+        :root {
+            --gold: #ffd700;
+            --red: #d32f2f;
+            --dark-red: #800000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            z-index: 1;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--gold);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .class-name {
+            font-size: 1.8rem;
+            color: #ffeb3b;
+            margin-bottom: 30px;
+        }
+
+        /* Lời chúc từ Lớp trưởng */
+        .message-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 30px rgba(211, 47, 47, 0.5);
+            margin-bottom: 50px;
+            line-height: 1.8;
+            text-align: left;
+        }
+
+        .message-box h3 {
+            color: var(--gold);
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* Vòng quay */
+        .lucky-section {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 5px double var(--gold);
+            margin-bottom: 20px;
+        }
+
+        #wheel {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            border: 10px solid var(--gold);
+            background: conic-gradient(from 0deg, #ff4d4d, #f9ca24, #ff4d4d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            font-weight: bold;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+
+        .btn-spin {
+            background: linear-gradient(135deg, var(--red), #ff5252);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border: 2px solid var(--gold);
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-spin:disabled {
+            background: #555;
+            cursor: not-allowed;
+            border-color: #888;
+        }
+
+        .result-text {
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-top: 20px;
+            font-weight: bold;
+            height: 40px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks"></canvas>
+
+    <div class="container">
+        <h1>BÍNH NGỌ 2026</h1>
+        <div class="class-name">🏮 Chúc Mừng Năm Mới Tập Thể Lớp 12a3 Thân Yêu 🏮</div>
+
+        <div class="message-box">
+            <h3>💌 Lời Chúc Từ Lớp Trưởng</h3>
+            <p>Gửi những người bạn cùng chiến tuyến của tớ!</p>
+            <p>Năm 2026 là một cột mốc cực kỳ đặc biệt với chúng mình - năm của sự bứt phá và trưởng thành. Thay mặt "ban cán sự", chúc các bạn một năm <b>Bính Ngọ</b> rực rỡ như pháo hoa, bền bỉ như "ngựa chiến" để vượt qua kỳ thi đại học sắp tới.</p>
+            <p>Chúc mỗi thành viên trong lớp mình không chỉ đỗ nguyện vọng 1 mà còn luôn giữ vững tình bạn bền chặt này. Hãy cùng nhau tạo nên những kỷ niệm cuối cấp thật đẹp và rực rỡ nhé! Đừng quên "lấy hên" bằng vòng quay may mắn bên dưới nha!</p>
+            <p style="text-align: right;"><i>Thân ái, Lớp trưởng của các bạn.</i></p>
+        </div>
+
+        <div class="lucky-section">
+            <div id="wheel">?</div>
+        </div>
+        <br>
+        <button id="spinBtn" class="btn-spin" onclick="spinWheel()">NHẬN LÌ XÌ MAY MẮN</button>
+        <div id="result" class="result-text"></div>
+    </div>
+
+    <script>
+        // --- HIỆU ỨNG PHÁO HOA ---
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                this.velocity = { x: (Math.random() - 0.5) * 8, y: (Math.random() - 0.5) * 8 };
+                this.alpha = 1;
+                this.friction = 0.95;
+            }
+            draw() {
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        let particles = [];
+        function createFirework(x, y) {
+            const colors = ['#ff0000', '#ffd700', '#ffffff', '#ff69b4', '#00ff00'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                if (p.alpha > 0) { p.update(); p.draw(); }
+                else { particles.splice(i, 1); }
+            });
+            if (Math.random() < 0.05) createFirework(Math.random() * canvas.width, Math.random() * canvas.height * 0.5);
+        }
+        animate();
+
+        // --- VÒNG QUAY MAY MẮN ---
+        const wheel = document.getElementById('wheel');
+        const spinBtn = document.getElementById('spinBtn');
+        const resultText = document.getElementById('result');
+
+        // Kiểm tra xem đã quay chưa (Lưu vào LocalStorage)
+        if (localStorage.getItem('hasSpun2026')) {
+            const savedNum = localStorage.getItem('luckyNum2026');
+            spinBtn.disabled = true;
+            spinBtn.innerText = "BẠN ĐÃ NHẬN LỘC RỒI";
+            wheel.innerText = savedNum;
+            resultText.innerText = `Số may mắn của bạn là ${savedNum}. Chúc năm mới thắng lợi!`;
+        }
+
+        function spinWheel() {
+            if (localStorage.getItem('hasSpun2026')) return;
+
+            const luckyNumber = Math.floor(Math.random() * 100) + 1;
+            const randomRotation = 1800 + Math.floor(Math.random() * 360); // Quay ít nhất 5 vòng
+
+            spinBtn.disabled = true;
+            resultText.innerText = "Đang tìm kiếm may mắn...";
+            wheel.style.transform = `rotate(${randomRotation}deg)`;
+
+            setTimeout(() => {
+                wheel.style.transition = "none";
+                wheel.style.transform = "rotate(0deg)";
+                wheel.innerText = luckyNumber;
+                resultText.innerText = `Chúc mừng! Con số may mắn của bạn là: ${luckyNumber}`;
+                
+                // Lưu trạng thái
+                localStorage.setItem('hasSpun2026', 'true');
+                localStorage.setItem('luckyNum2026', luckyNumber);
+                
+                // Bắn pháo hoa liên tục khi trúng số
+                for(let i=0; i<5; i++) {
+                    setTimeout(() => createFirework(window.innerWidth/2, window.innerHeight/2), i*300);
+                }
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
